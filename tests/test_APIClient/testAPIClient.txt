@@ -1,0 +1,279 @@
+import HumanTradingBot.tests.test_APIClient.test_RequestHandler as test_RequestHandler
+import logging
+
+logger = logging.get_logger(__name__)
+
+class APIClient:
+    def __init__(self):
+        self.request_handler = test_RequestHandler()
+    
+    def test_new_order(self, symbol, side, quantity, price):
+        """Test new order endpoint (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "type": "LIMIT",
+            "timeInForce": "GTC",
+            "quantity": quantity,
+            "price": price
+        }
+        return self.request_handler.retry_request('POST', 'new_order_test', params=params)
+
+    def query_order(self, symbol, order_id):
+        """Query an order's status (USER_DATA)."""
+        params = {"symbol": symbol, "orderId": order_id}
+        return self.request_handler.retry_request('GET', 'query_order', params=params)
+
+    def cancel_order(self, symbol, order_id):
+        """Cancel an active order (TRADE)."""
+        params = {"symbol": symbol, "orderId": order_id}
+        return self.request_handler.retry_request('DELETE', 'cancel_order', params=params)
+
+    def cancel_all_orders(self, symbol):
+        """Cancel all open orders on a symbol (TRADE)."""
+        params = {"symbol": symbol}
+        return self.request_handler.retry_request('DELETE', 'cancel_all_orders', params=params)
+
+    def cancel_replace_order(self, symbol, cancel_order_id, new_order_params):
+        """Cancel an existing order and place a new one (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "cancelOrderId": cancel_order_id,
+            **new_order_params
+        }
+        return self.request_handler.retry_request('POST', 'cancel_replace_order', params=params)
+
+    def get_open_orders(self, symbol=None):
+        """Get all open orders on a symbol (USER_DATA)."""
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
+        return self.request_handler.retry_request('GET', 'open_orders', params=params)
+
+    def get_order_history(self, symbol):
+        """Get all account orders; active, canceled, or filled (USER_DATA)."""
+        params = {"symbol": symbol}
+        return self.request_handler.retry_request('GET', 'order_history', params=params)
+
+    def place_oco_order(self, symbol, side, quantity, price, stop_price):
+        """Send a new OCO order (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "quantity": quantity,
+            "price": price,
+            "stopPrice": stop_price
+        }
+        return self.request_handler.retry_request('POST', 'new_oco_order', params=params)
+
+    def cancel_order_list(self, order_list_id):
+        """Cancel an entire order list (TRADE)."""
+        params = {"orderListId": order_list_id}
+        return self.request_handler.retry_request('DELETE', 'cancel_order_list', params=params)
+
+    def get_order_list(self, order_list_id):
+        """Retrieve a specific order list (USER_DATA)."""
+        params = {"orderListId": order_list_id}
+        return self.request_handler.retry_request('GET', 'get_order_list', params=params)
+
+    def get_all_order_lists(self, symbol=None):
+        """Retrieve all order lists (USER_DATA)."""
+        params = {}
+        if symbol:
+            params['symbol'] = symbol
+        return self.request_handler.retry_request('GET', 'all_order_lists', params=params)
+
+    def start_user_data_stream(self):
+        """Start a new user data stream (USER_STREAM)."""
+        return self.request_handler.retry_request('POST', 'start_user_data_stream')
+
+    def keepalive_user_data_stream(self, listen_key):
+        """Keepalive a user data stream (USER_STREAM)."""
+        params = {"listenKey": listen_key}
+        return self.request_handler.retry_request('PUT', 'keepalive_user_data_stream', params=params)
+
+    def close_user_data_stream(self, listen_key):
+        """Close a user data stream (USER_STREAM)."""
+        params = {"listenKey": listen_key}
+        return self.request_handler.retry_request('DELETE', 'close_user_data_stream', params=params)
+
+    def get_account_info(self):
+        """Get current account information (USER_DATA)."""
+        return self.request_handler.retry_request('GET', 'account_info')
+
+    def cancel_order_using_sor(self, symbol, side, quantity, price):
+        """Cancel an order using smart order routing (SOR) (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "quantity": quantity,
+            "price": price
+        }
+        return self.request_handler.retry_request('POST', 'cancel_sor_order', params=params)
+
+    def test_new_order_using_sor(self, symbol, side, quantity, price):
+        """Test new order using smart order routing (SOR) (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "type": "LIMIT",
+            "timeInForce": "GTC",
+            "quantity": quantity,
+            "price": price
+        }
+        return self.request_handler.retry_request('POST', 'test_sor_order', params=params)
+
+    def new_order_list_oto(self, symbol, side, quantity, price, stop_price):
+        """Create a new OTO order (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "quantity": quantity,
+            "price": price,
+            "stopPrice": stop_price
+        }
+        return self.request_handler.retry_request('POST', 'new_oto_order', params=params)
+
+    def new_order_list_otoco(self, symbol, side, quantity, price, stop_price, stop_limit_price):
+        """Create a new OTOCO order (TRADE)."""
+        params = {
+            "symbol": symbol,
+            "side": side,
+            "quantity": quantity,
+            "price": price,
+            "stopPrice": stop_price,
+            "stopLimitPrice": stop_limit_price
+        }
+        return self.request_handler.retry_request('POST', 'new_otoco_order', params=params)
+
+    def get_account_trade_list(self, symbol):
+        """Get trades for a specific account and symbol (USER_DATA)."""
+        params = {"symbol": symbol}
+        return self.request_handler.retry_request('GET', 'account_trade_list', params=params)
+
+    def query_unfilled_order_count(self):
+        """Query unfilled order count for all intervals (USER_DATA)."""
+        return self.request_handler.retry_request('GET', 'unfilled_order_count')
+
+    def query_prevented_matches(self):
+        """Query prevented matches (USER_DATA)."""
+        return self.request_handler.retry_request('GET', 'prevented_matches')
+
+    def query_allocations(self):
+        """Query allocations resulting from SOR order placement (USER_DATA)."""
+        return self.request_handler.retry_request('GET', 'allocations')
+
+    def query_commission_rates(self):
+        """Query current account commission rates (USER_DATA)."""
+        return self.request_handler.retry_request('GET', 'commission_rates')
+    
+import time
+
+class test_RetryManager:
+    def __init__(self, retries=3, max_retry_time=120):
+        self.retries = retries
+        self.max_retry_time = max_retry_time
+
+    def execute_with_retry(self, func, *args, **kwargs):
+        start_time = time.time()
+        for i in range(self.retries):
+            if time.time() - start_time > self.max_retry_time:
+                raise Exception("Max retry time exceeded.")
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                if i == self.retries - 1:
+                    raise
+                time.sleep(2 ** i)  # Exponential backoff
+
+
+import requests
+import time
+import hmac
+import hashlib
+from urllib.parse import urlencode
+from Configuration import config  # Import de la config contenant les endpoints et les URLs
+import HumanTradingBot.tests.test_APIClient.test_RetryManager as test_RetryManager
+import HumanTradingBot.tests.test_APIClient.test_ResponseHandler as test_ResponseHandler
+
+class test_RequestHandler:
+    def __init__(self):
+        self.api_key = config.API_KEY
+        self.api_secret = config.SECRET_KEY
+        self.base_url = config.BASE_URL[0] # TODO optionnal : add logic to go through all base_url, in case of one failed after multiple atempt
+        self.retry_manager =  test_RetryManager()
+        self.response_handler =  test_ResponseHandler()
+
+    def _get_headers(self):
+        return {"X-MBX-APIKEY": self.api_key}
+
+    def _sign(self, params):
+        query_string = urlencode(params)
+        signature = hmac.new(
+            self.api_secret.encode("utf-8"),
+            query_string.encode("utf-8"),
+            hashlib.sha256
+        ).hexdigest()
+        return signature
+
+    def retry_request(self, method, endpoint, params=None, data=None):
+        if params is None:
+            params = {}
+        params['timestamp'] = int(time.time() * 1000)
+        params['signature'] = self._sign(params)
+        
+        endpoint = config.ENDPOINTS.get(endpoint)
+        if not endpoint :
+            raise ValueError(f"Endpoint '{endpoint}' not found in configuration.")
+
+        url = f"{self.base_url}{endpoint}"
+        headers = self._get_headers()
+        
+        return self.retry_manager.execute_with_retry(
+            self._send_http_request, method, url, headers, params, data
+        )
+
+    def _send_http_request(self, method, url, headers, params=None, data=None):
+        response = requests.request(method, url, headers=headers, params=params, data=data)
+        return self.response_handler.handle(response)
+    
+
+class test_ResponseHandler:
+    @staticmethod
+    def handle(response):
+        """Gère les réponses de l'API en tenant compte des différents codes HTTP et des erreurs spécifiques."""
+        status_code = response.status_code
+        headers = response.headers
+        
+        if status_code == 200:
+            return response.json(), "success", None
+        elif status_code == 429:
+            # Too Many Requests: Backoff and retry after the specified time
+            retry_after = int(headers.get("Retry-After", 1))
+            return None, "retry", retry_after
+        elif status_code == 418:
+            # IP banned
+            retry_after = int(headers.get("Retry-After", 60))
+            return None, "ip_banned", retry_after
+        elif status_code == 403:
+            # Web Application Firewall Limit (WAF) violation
+            return None, "error", "WAF Limit violation"
+        elif status_code == 409:
+            # Partial success in cancelReplace
+            return {"partial_success": True, **response.json()}, "partial_success", None
+        elif 500 <= status_code < 600:
+            # 5XX errors indicate an internal server error
+            return None, "retry", 2  # Retry avec backoff exponentiel (géré ailleurs)
+        elif 400 <= status_code < 500:
+            # 4XX client-side errors
+            error_payload = response.json()
+            error_code = error_payload.get("code")
+            error_message = error_payload.get("msg")
+            # Gestion de certains codes d'erreur spécifiques
+            if error_code == -1121:
+                return None, "error", f"Invalid symbol: {error_message}"
+            elif error_code == -2010:
+                return None, "error", f"Insufficient balance: {error_message}"
+            return None, "error", f"Client error ({status_code}): {error_message} (Code: {error_code})"
+        else:
+            return None, "error", f"Unexpected response. Status: {status_code}, Response: {response.text}"
