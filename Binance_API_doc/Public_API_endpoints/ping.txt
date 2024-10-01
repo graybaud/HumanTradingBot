@@ -1,0 +1,14 @@
+Test connectivity
+GET /api/v3/ping
+
+Test connectivity to the Rest API.
+
+Weight: 1
+
+Parameters: NONE
+
+Data Source: Memory
+
+Response:
+
+{}

@@ -1,0 +1,128 @@
+Compressed/Aggregate trades list
+GET /api/v3/aggTrades
+
+Get compressed, aggregate trades. Trades that fill at the time, from the same taker order, with the same price will have the quantity aggregated.
+
+Weight: 2
+
+Parameters:
+
+Name	Type	Mandatory	Description
+symbol	STRING	YES	
+fromId	LONG	NO	ID to get aggregate trades from INCLUSIVE.
+startTime	LONG	NO	Timestamp in ms to get aggregate trades from INCLUSIVE.
+endTime	LONG	NO	Timestamp in ms to get aggregate trades until INCLUSIVE.
+limit	INT	NO	Default 500; max 1000.
+If fromId, startTime, and endTime are not sent, the most recent aggregate trades will be returned.
+Data Source: Database
+
+Response:
+
+[
+  {
+    "a": 26129,         // Aggregate tradeId
+    "p": "0.01633102",  // Price
+    "q": "4.70443515",  // Quantity
+    "f": 27781,         // First tradeId
+    "l": 27781,         // Last tradeId
+    "T": 1498793709153, // Timestamp
+    "m": true,          // Was the buyer the maker?
+    "M": true           // Was the trade the best price match?
+  }
+]
+
+Note: 
+L'endpoint **GET /api/v3/aggTrades** permet de récupérer des **trades compressés**
+ou **agrégés**. Cela signifie que les trades qui remplissent certaines conditions
+(comme avoir le même prix, appartenir à la même commande et exécutés par un seul "taker")
+sont regroupés dans une seule entrée pour fournir une vue simplifiée des transactions.
+
+### **Analyse des paramètres**
+
+1. **symbol** (type: `STRING`, obligatoire : `OUI`)
+   - **Description** : Ce paramètre identifie la paire de trading
+   (par exemple, `BTCUSDT` pour la paire Bitcoin/USDT).
+   - **Usage** : Obligatoire, il est utilisé pour indiquer la paire
+   de crypto-monnaies dont les trades agrégés doivent être retournés.
+
+2. **fromId** (type: `LONG`, obligatoire : `NON`)
+   - **Description** : Ce paramètre indique l'ID du trade agrégé à partir
+   duquel commencer à récupérer les données. Il est inclusif, ce qui signifie
+   que le trade avec cet ID sera inclus dans la réponse.
+   - **Usage** : Utile si tu veux obtenir des données à partir d'un point
+   spécifique dans le passé, basé sur l'identifiant du trade.
+
+3. **startTime** (type: `LONG`, obligatoire : `NON`)
+   - **Description** : Un timestamp (en millisecondes) à partir duquel commencer
+   la collecte des trades agrégés. Il est inclusif, donc les trades à partir de ce moment seront inclus.
+   - **Usage** : Permet de restreindre les résultats dans une plage de temps,
+   à partir d'un moment donné.
+
+4. **endTime** (type: `LONG`, obligatoire : `NON`)
+   - **Description** : Un timestamp (en millisecondes) jusqu'auquel les trades
+   agrégés doivent être récupérés. Il est inclusif également.
+   - **Usage** : Complémentaire à `startTime` pour délimiter la plage de temps,
+   utile pour obtenir des données sur une période spécifique.
+
+5. **limit** (type: `INT`, obligatoire : `NON`)
+   - **Description** : Ce paramètre détermine combien de trades agrégés
+   doivent être retournés. Par défaut, la limite est fixée à 500, mais peut aller jusqu'à 1000.
+   - **Usage** : Si tu veux limiter ou élargir la quantité de données retournées,
+   ce paramètre te permet de le faire. Un plus grand `limit` pourrait entraîner une réponse plus lourde mais plus complète.
+
+6. **Comportement par défaut** :
+   - Si **aucun** des paramètres optionnels (`fromId`, `startTime`, `endTime`)
+   n'est spécifié, l'API retourne les **trades agrégés les plus récents**.
+
+### **Explication de la réponse JSON**
+
+La réponse est une liste d'objets JSON, où chaque objet représente un trade agrégé.
+
+- `"a": 26129`  
+   - **ID du trade agrégé** : C'est l'identifiant unique pour ce trade agrégé.
+   Il permet de suivre un groupe de trades.
+  
+- `"p": "0.01633102"`  
+   - **Prix** : C'est le prix auquel les trades agrégés ont été effectués.
+
+- `"q": "4.70443515"`  
+   - **Quantité** : La quantité totale de crypto-monnaies échangée dans ce trade agrégé.
+
+- `"f": 27781`  
+   - **Premier trade ID** : C'est l'ID du premier trade dans cette agrégation.
+
+- `"l": 27781`  
+   - **Dernier trade ID** : C'est l'ID du dernier trade dans cette agrégation.
+   Ici, il est identique à `f`, ce qui signifie qu'un seul trade compose cette agrégation.
+
+- `"T": 1498793709153`  
+   - **Timestamp** : Ce champ indique l'heure du trade, en millisecondes depuis l'époque UNIX (UTC).
+
+- `"m": true`  
+   - **Le buyer était-il un maker ?** : Si `true`, cela signifie que l'acheteur
+   était un "maker", c'est-à-dire qu'il a placé une limite d'ordre qui n'a pas
+   immédiatement été exécutée, ajoutant ainsi de la liquidité au carnet d'ordres.
+
+- `"M": true`  
+   - **Le trade correspondait-il au meilleur prix ?** : Si `true`, cela signifie
+   que le trade a été exécuté au meilleur prix disponible à ce moment-là.
+
+### **Poids de la requête**
+
+- **Weight: 2**  
+   - Cela signifie que chaque requête à cet endpoint consomme **2 unités** sur le
+   quota de poids (API Weight) imposé par Binance pour éviter l'abus de leur service API.
+   La gestion efficace de ces unités est cruciale pour éviter de dépasser les limites de taux de l'API.
+
+### **Explications supplémentaires**
+
+L'agrégation des trades est utile pour plusieurs raisons :
+- **Réduction du volume de données** : En regroupant les trades similaires,
+la réponse est moins volumineuse, ce qui est crucial pour des systèmes nécessitant des performances élevées.
+- **Meilleure lisibilité** : Cela permet une vue plus claire des prix et
+des quantités échangées sur le marché à un moment donné.
+- **Usage dans l'analyse** : Les données compressées peuvent être utilisées
+pour analyser le comportement du marché sans traiter chaque trade individuel.
+
+Cette méthode est souvent utilisée pour obtenir une vue d'ensemble plus rapide
+des transactions sans surcharger le système avec des détails inutiles.
