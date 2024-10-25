@@ -43,3 +43,47 @@ Response:
     "0"                 // Unused field. Ignore.
   ]
 ]
+
+
+    def get_ui_klines(self, symbol, interval, startTime=None, endTime=None, timeZone="0", limit=500):
+        """
+        Get modified kline data optimized for candlestick chart presentation.
+
+        Weight:
+            - 2 for each request.
+            
+        Input:
+            - symbol (string): The trading pair (mandatory).
+            - interval (string): Time interval between klines (mandatory). E.g. '1m', '5m', '1d'.
+            - startTime (long): Timestamp in ms to start the data retrieval (optional).
+            - endTime (long): Timestamp in ms to end the data retrieval (optional).
+            - timeZone (string): Time zone offset from UTC, default is '0' (optional).
+                                Supported formats: "+05:00", "-3:30", "0".
+            - limit (integer): Number of klines to retrieve, defaults to 500, maximum is 1000 (optional).
+
+        Output:
+            - Returns a list of klines (candlesticks) with optimized formatting for charting.
+
+        Response example:
+            [
+            [
+                1499040000000,      // Kline open time
+                "0.01634790",       // Open price
+                "0.80000000",       // High price
+                "0.01575800",       // Low price
+                "0.01577100",       // Close price
+                "148976.11427815",  // Volume
+                1499644799999,      // Kline close time
+                "2434.19055334",    // Quote asset volume
+                308,                // Number of trades
+                "1756.87402397",    // Taker buy base asset volume
+                "28.46694368",      // Taker buy quote asset volume
+                "0"                 // Unused field. Ignore.
+            ]
+            ]
+
+        Notes:
+            - The response is optimized for graphical presentation and can be directly used in candlestick charting.
+            - The timeZone allows you to shift the interpretation of intervals into the specified timezone, but `startTime` and `endTime` are always in UTC.
+            - If `startTime` and `endTime` are not provided, the most recent klines are returned.
+        """

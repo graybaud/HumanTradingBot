@@ -33,3 +33,39 @@ Response:
     ]
   ]
 }
+
+
+    def get_depth(self, symbol: str, limit: int = 100):
+        """
+        Calls the Binance API to retrieve the order book (market depth) for a given symbol.
+
+        Weight: Varies based on the limit:
+            - Limit 1-100: Weight = 5
+            - Limit 101-500: Weight = 25
+            - Limit 501-1000: Weight = 50
+            - Limit 1001-5000: Weight = 250
+
+        Parameters:
+        - symbol (str): The symbol for which to retrieve the order book (e.g., 'BTCUSDT').
+        - limit (int, optional): The number of levels to retrieve. Default is 100; max is 5000. If limit > 5000, response is truncated to 5000.
+        
+        Returns:
+        - dict: Contains the last update ID, bids, and asks.
+        
+        Example Response:
+        {
+        "lastUpdateId": 1027024,  # The ID of the last update
+        "bids": [                 # The bid side of the order book (price, quantity)
+            [
+            "4.00000000",         # Price
+            "431.00000000"        # Quantity
+            ]
+        ],
+        "asks": [                 # The ask side of the order book (price, quantity)
+            [
+            "4.00000200",
+            "12.00000000"
+            ]
+        ]
+        }
+        """

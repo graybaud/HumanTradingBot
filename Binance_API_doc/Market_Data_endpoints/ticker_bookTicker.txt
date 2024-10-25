@@ -50,3 +50,23 @@ OR
     "askQty": "1000.00000000"
   }
 ]
+
+
+
+    def get_book_ticker(self, symbol=None, symbols=None):
+        """
+        Calls the best price/qty on the order book for a given symbol(s).
+
+        Weight:
+            - With one symbol: 2
+            - Without symbol or with multiple symbols: 4
+
+        Input:
+            - symbol (string): The trading pair (optional).
+            - symbols (list of strings): List of trading pairs (optional).
+
+        Output:
+            - Returns the best bid and ask price/qty for the specified symbol(s).
+
+        If no symbol or symbols are specified, returns the data for all symbols.
+        """

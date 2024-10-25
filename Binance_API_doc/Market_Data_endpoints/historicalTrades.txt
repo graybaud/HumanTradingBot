@@ -64,3 +64,19 @@ Copier le code
     "isBestMatch": true
   }
 ]
+
+
+    def get_historical_trades(self, symbol, limit=500, fromId=None):
+        """
+        Calls the endpoint for old trade lookup.
+
+        Weight: 25
+
+        Input: 
+            - symbol (string): The trading pair (e.g., 'BTCUSDT').
+            - limit (int): Number of trades to retrieve (default: 500, max: 1000).
+            - fromId (long): The trade ID to fetch from (optional).
+
+        Output:
+            - Returns a list of old trades with detailed information such as trade ID, price, quantity, etc.
+        """

@@ -164,3 +164,43 @@ trailingDelta	Delta price change required before order activation	Appears for Tr
 trailingTime	Time when the trailing order is now active and tracking price changes	Appears only for Trailing Stop Orders.	"trailingTime": -1
 usedSor	Field that determines whether order used SOR	Appears when placing orders using SOR	"usedSor": true
 workingFloor	Field that determines whether the order is being filled by the SOR or by the order book the order was submitted to.	Appears when placing orders using SOR	"workingFloor": "SOR"
+
+
+
+
+    def create_new_order(self, params: dict):
+        """
+        Sends a new order to the Binance API.
+
+        Parameters:
+        - params (dict): Dictionary containing the order parameters. Mandatory fields include:
+        - symbol (str): Trading pair symbol (e.g., 'BTCUSDT').
+        - side (str): BUY or SELL.
+        - type (str): Order type (e.g., 'LIMIT', 'MARKET').
+        - timestamp (int): Current timestamp.
+
+        Optional fields may include:
+        - timeInForce (str): GTC, FOK, IOC for LIMIT orders.
+        - quantity (float): Quantity of the asset being traded.
+        - quoteOrderQty (float): Amount of quote asset to trade for MARKET orders.
+        - price (float): Price of the asset for LIMIT orders.
+        - newClientOrderId (str): Unique client order ID.
+        - stopPrice (float): Price to trigger the order for STOP_LOSS, TAKE_PROFIT, or similar orders.
+        - icebergQty (float): Used for iceberg orders.
+        - recvWindow (int): The time window for receiving the request (default is 5000 ms).
+        - strategyId (long): ID for labeling strategy orders.
+        - strategyType (int): Type for labeling strategy orders.
+        - trailingDelta (long): Delta for trailing stop orders.
+        - newOrderRespType (str): Set response type (ACK, RESULT, FULL).
+        - reduceOnly (bool): For reduce-only orders on futures.
+        - closePosition (bool): For closing position orders on futures.
+
+        Returns:
+        - dict: The response from the Binance API.
+
+        Notes:
+        - Ensure either `quantity` or `quoteOrderQty` is provided based on the order type.
+        - For LIMIT orders, `price` and `timeInForce` are required.
+        - For STOP_LOSS, STOP_LOSS_LIMIT, TAKE_PROFIT, and TAKE_PROFIT_LIMIT orders, `stopPrice` or `trailingDelta` must be provided.
+        - Optional parameters such as `strategyId`, `strategyType`, `trailingDelta`, `reduceOnly`, and `closePosition` are specific to advanced order types or futures trading.
+        """

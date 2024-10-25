@@ -144,3 +144,24 @@ With symbols:
     "count": 98698
   }
 ]
+
+
+    def get_trading_day_ticker(self, symbol=None, symbols=None, dataType="FULL", timeZone=0):
+        """
+        Calls the price change statistics for a trading day.
+
+        Weight:
+            - 4 for each requested symbol.
+            - If more than 50 symbols, the request weight caps at 200.
+
+        Input:
+            - symbol (string): The trading pair (optional).
+            - symbols (list of strings): List of trading pairs (optional).
+            - dataType (string): Can be 'FULL' or 'MINI' to specify the response type (default is 'FULL').
+            - timeZone (string): Specifies the time zone offset (default is UTC, which is 0).
+
+        Output:
+            - Returns trading day statistics for a given symbol(s) in FULL or MINI format.
+
+        If neither `symbol` nor `symbols` is provided, an error will occur (one must be provided).
+        """

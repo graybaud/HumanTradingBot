@@ -33,6 +33,8 @@ For GET endpoints, parameters must be sent as a query string.
 For POST, PUT, and DELETE endpoints, the parameters may be sent as a query string or in the request body with content type application/x-www-form-urlencoded. You may mix parameters between both the query string and request body if you wish to do so.
 Parameters may be sent in any order.
 If a parameter sent in both the query string and request body, the query string parameter will be used.
+
+
 LIMITS
 General Info on Limits
 The following intervalLetter values for headers:
@@ -40,37 +42,53 @@ SECOND => S
 MINUTE => M
 HOUR => H
 DAY => D
-intervalNum describes the amount of the interval. For example, intervalNum 5 with intervalLetter M means "Every 5 minutes".
-The /api/v3/exchangeInfo rateLimits array contains objects related to the exchange's RAW_REQUESTS, REQUEST_WEIGHT, and ORDERS rate limits. These are further defined in the ENUM definitions section under Rate limiters (rateLimitType).
+intervalNum describes the amount of the interval.
+For example, intervalNum 5 with intervalLetter M means "Every 5 minutes".
+The /api/v3/exchangeInfo rateLimits array contains objects related
+to the exchange's RAW_REQUESTS, REQUEST_WEIGHT, and ORDERS rate limits.
+These are further defined in the ENUM definitions section under Rate limiters (rateLimitType).
 Requests fail with HTTP status code 429 when you exceed the request rate limit.
+
 IP Limits
-Every request will contain X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter) in the response headers which has the current used weight for the IP for all request rate limiters defined.
-Each route has a weight which determines for the number of requests each endpoint counts for. Heavier endpoints and endpoints that do operations on multiple symbols will have a heavier weight.
+Every request will contain X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter)
+in the response headers which has the current used weight for the IP for all request rate limiters defined.
+Each route has a weight which determines for the number of requests each
+endpoint counts for. Heavier endpoints and endpoints that do operations on multiple symbols will have a heavier weight.
 When a 429 is received, it's your obligation as an API to back off and not spam the API.
-Repeatedly violating rate limits and/or failing to back off after receiving 429s will result in an automated IP ban (HTTP status 418).
+Repeatedly violating rate limits and/or failing to back off after
+receiving 429s will result in an automated IP ban (HTTP status 418).
 IP bans are tracked and scale in duration for repeat offenders, from 2 minutes to 3 days.
-A Retry-After header is sent with a 418 or 429 responses and will give the number of seconds required to wait, in the case of a 429, to prevent a ban, or, in the case of a 418, until the ban is over.
+A Retry-After header is sent with a 418 or 429 responses and will give
+the number of seconds required to wait, in the case of a 429, to prevent
+a ban, or, in the case of a 418, until the ban is over.
 The limits on the API are based on the IPs, not the API keys.
 Unfilled Order Count
-Every successful order response will contain a X-MBX-ORDER-COUNT-(intervalNum)(intervalLetter) header indicating how many orders you have placed for that interval.
+Every successful order response will contain a X-MBX-ORDER-COUNT-(intervalNum)(intervalLetter)
+header indicating how many orders you have placed for that interval.
 
 To monitor this, refer to GET api/v3/rateLimit/order.
 Rejected/unsuccessful orders are not guaranteed to have X-MBX-ORDER-COUNT-** headers in the response.
 If you have exceeded this, you will receive a 429 error without the Retry-After header.
-Please note that if your orders are consistently filled by trades, you can continuously place orders on the API. For more information, please see Spot Unfilled Order Count Rules.
+Please note that if your orders are consistently filled by trades, you can continuously
+place orders on the API. For more information, please see Spot Unfilled Order Count Rules.
 The number of unfilled orders is tracked for each account.
+
 Data Sources
 The API system is asynchronous, so some delay in the response is normal and expected.
-Each endpoint has a data source indicating where the data is being retrieved, and thus which endpoints have the most up-to-date response.
+Each endpoint has a data source indicating where the data is being retrieved,
+and thus which endpoints have the most up-to-date response.
 These are the three sources, ordered by least to most potential for delays in data updates.
 
 Matching Engine - the data is from the Matching Engine
 Memory - the data is from a server's local or external memory
 Database - the data is taken directly from a database
-Some endpoints can have more than 1 data source. (e.g. Memory => Database) This means that the endpoint will check the first Data Source, and if it cannot find the value it's looking for it will check the next one.
+Some endpoints can have more than 1 data source. (e.g. Memory => Database)
+This means that the endpoint will check the first Data Source,
+and if it cannot find the value it's looking for it will check the next one.
 
 Endpoint security type
-Each endpoint has a security type that determines how you will interact with it. This is stated next to the NAME of the endpoint.
+Each endpoint has a security type that determines how you will interact with it.
+This is stated next to the NAME of the endpoint.
 If no security type is stated, assume the security type is NONE.
 API-keys are passed into the Rest API via the X-MBX-APIKEY header.
 API-keys and secret-keys are case sensitive.
@@ -78,6 +96,7 @@ API-keys can be configured to only access certain types of secure endpoints.
 For example, one API-key could be used for TRADE only,
 while another API-key can access everything except for TRADE routes.
 By default, API-keys can access all secure routes.
+
 Security Type	Description
 NONE	Endpoint can be accessed freely.
 TRADE	Endpoint requires sending a valid API-Key and signature.
@@ -85,13 +104,18 @@ USER_DATA	Endpoint requires sending a valid API-Key and signature.
 USER_STREAM	Endpoint requires sending a valid API-Key.
 TRADE and USER_DATA endpoints are SIGNED endpoints.
 SIGNED (TRADE and USER_DATA) Endpoint security
-SIGNED endpoints require an additional parameter, signature, to be sent in the query string or request body.
+SIGNED endpoints require an additional parameter, signature,
+to be sent in the query string or request body.
 The signature is not case sensitive.
-Please consult the examples below on how to compute signature, depending on which API key type you are using.
+Please consult the examples below on how to compute signature,
+depending on which API key type you are using.
 Timing security
-A SIGNED endpoint also requires a parameter, timestamp, to be sent which should be the millisecond timestamp of when the request was created and sent.
+A SIGNED endpoint also requires a parameter, timestamp,
+to be sent which should be the millisecond timestamp of when the request was created and sent.
 
-An additional parameter, recvWindow, may be sent to specify the number of milliseconds after timestamp the request is valid for. If recvWindow is not sent, it defaults to 5000.
+An additional parameter, recvWindow, may be sent to specify
+the number of milliseconds after timestamp the request is valid for.
+If recvWindow is not sent, it defaults to 5000.
 
 The logic is as follows:
 
@@ -101,7 +125,10 @@ if (timestamp < (serverTime + 1000) && (serverTime - timestamp) <= recvWindow) {
   // reject request
 }
 
-Serious trading is about timing. Networks can be unstable and unreliable, which can lead to requests taking varying amounts of time to reach the servers. With recvWindow, you can specify that the request must be processed within a certain number of milliseconds or be rejected by the server.
+Serious trading is about timing. Networks can be unstable and
+unreliable, which can lead to requests taking varying amounts
+of time to reach the servers. With recvWindow, you can specify
+that the request must be processed within a certain number of milliseconds or be rejected by the server.
 
 It is recommended to use a small recvWindow of 5000 or less! The max cannot go beyond 60,000!
 
@@ -228,7 +255,8 @@ curl -H "X-MBX-APIKEY: $API_KEY" -X "$API_METHOD" \
     --data-urlencode "signature=$signature"
 
 Ed25519 Keys
-Note: It is highly recommended to use Ed25519 API keys as it should provide the best performance and security out of all supported key types.
+Note: It is highly recommended to use Ed25519 API keys as it should
+provide the best performance and security out of all supported key types.
 
 Parameter	Value
 symbol	BTCUSDT

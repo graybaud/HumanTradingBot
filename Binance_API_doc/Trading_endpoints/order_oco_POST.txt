@@ -1,0 +1,101 @@
+Order lists
+New OCO - Deprecated (TRADE)
+POST /api/v3/order/oco 
+
+Send in a new OCO.
+
+Price Restrictions:
+SELL: Limit Price > Last Price > Stop Price
+BUY: Limit Price < Last Price < Stop Price
+Quantity Restrictions:
+Both legs must have the same quantity.
+ICEBERG quantities however do not have to be the same
+OCO adds 2 orders to the unfilled order count, EXCHANGE_MAX_ORDERS filter and the MAX_NUM_ORDERS filter.
+Weight: 1
+
+Parameters:
+
+Name	Type	Mandatory	Description
+symbol	STRING	YES	
+listClientOrderId	STRING	NO	A unique Id for the entire orderList
+side	ENUM	YES	
+quantity	DECIMAL	YES	
+limitClientOrderId	STRING	NO	A unique Id for the limit order
+price	DECIMAL	YES	
+limitStrategyId	LONG	NO	
+limitStrategyType	INT	NO	The value cannot be less than 1000000.
+limitIcebergQty	DECIMAL	NO	Used to make the LIMIT_MAKER leg an iceberg order.
+trailingDelta	LONG	NO	
+stopClientOrderId	STRING	NO	A unique Id for the stop loss/stop loss limit leg
+stopPrice	DECIMAL	YES	
+stopStrategyId	LONG	NO	
+stopStrategyType	INT	NO	The value cannot be less than 1000000.
+stopLimitPrice	DECIMAL	NO	If provided, stopLimitTimeInForce is required.
+stopIcebergQty	DECIMAL	NO	Used with STOP_LOSS_LIMIT leg to make an iceberg order.
+stopLimitTimeInForce	ENUM	NO	Valid values are GTC/FOK/IOC
+newOrderRespType	ENUM	NO	Set the response JSON.
+selfTradePreventionMode	ENUM	NO	The allowed enums is dependent on what is configured on the symbol. The possible supported values are EXPIRE_TAKER, EXPIRE_MAKER, EXPIRE_BOTH, NONE.
+recvWindow	LONG	NO	The value cannot be greater than 60000
+timestamp	LONG	YES	
+Data Source: Matching Engine
+
+Response:
+
+{
+  "orderListId": 0,
+  "contingencyType": "OCO",
+  "listStatusType": "EXEC_STARTED",
+  "listOrderStatus": "EXECUTING",
+  "listClientOrderId": "JYVpp3F0f5CAG15DhtrqLp",
+  "transactionTime": 1563417480525,
+  "symbol": "LTCBTC",
+  "orders": [
+    {
+      "symbol": "LTCBTC",
+      "orderId": 2,
+      "clientOrderId": "Kk7sqHb9J6mJWTMDVW7Vos"
+    },
+    {
+      "symbol": "LTCBTC",
+      "orderId": 3,
+      "clientOrderId": "xTXKaGYd4bluPVp78IVRvl"
+    }
+  ],
+  "orderReports": [
+    {
+      "symbol": "LTCBTC",
+      "orderId": 2,
+      "orderListId": 0,
+      "clientOrderId": "Kk7sqHb9J6mJWTMDVW7Vos",
+      "transactTime": 1563417480525,
+      "price": "0.000000",
+      "origQty": "0.624363",
+      "executedQty": "0.000000",
+      "cummulativeQuoteQty": "0.000000",
+      "status": "NEW",
+      "timeInForce": "GTC",
+      "type": "STOP_LOSS",
+      "side": "BUY",
+      "stopPrice": "0.960664",
+      "workingTime": -1,
+      "selfTradePreventionMode": "NONE"
+    },
+    {
+      "symbol": "LTCBTC",
+      "orderId": 3,
+      "orderListId": 0,
+      "clientOrderId": "xTXKaGYd4bluPVp78IVRvl",
+      "transactTime": 1563417480525,
+      "price": "0.036435",
+      "origQty": "0.624363",
+      "executedQty": "0.000000",
+      "cummulativeQuoteQty": "0.000000",
+      "status": "NEW",
+      "timeInForce": "GTC",
+      "type": "LIMIT_MAKER",
+      "side": "BUY",
+      "workingTime": 1563417480525,
+      "selfTradePreventionMode": "NONE"
+    }
+  ]
+}

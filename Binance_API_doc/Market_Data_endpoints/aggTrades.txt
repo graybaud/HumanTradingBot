@@ -126,3 +126,38 @@ pour analyser le comportement du marché sans traiter chaque trade individuel.
 
 Cette méthode est souvent utilisée pour obtenir une vue d'ensemble plus rapide
 des transactions sans surcharger le système avec des détails inutiles.
+
+
+
+
+
+    def get_aggregate_trades(self, symbol: str, fromId: int = None, startTime: int = None, endTime: int = None, limit: int = 500):
+        """
+        Calls the Binance API to get compressed, aggregate trades for a given symbol.
+
+        Weight: 2 (regardless of input parameters)
+
+        Parameters:
+        - symbol (str): The symbol to retrieve aggregate trades for (e.g., 'BTCUSDT').
+        - fromId (int, optional): The aggregate trade ID from which to start the retrieval (inclusive).
+        - startTime (int, optional): The start timestamp in milliseconds (inclusive).
+        - endTime (int, optional): The end timestamp in milliseconds (inclusive).
+        - limit (int, optional): The maximum number of aggregate trades to retrieve. Default is 500, and the maximum is 1000.
+
+        Returns:
+        - list of dict: Each dictionary contains information about an aggregate trade.
+
+        Example Response:
+        [
+        {
+            "a": 26129,         # Aggregate trade ID
+            "p": "0.01633102",  # Price
+            "q": "4.70443515",  # Quantity
+            "f": 27781,         # First trade ID
+            "l": 27781,         # Last trade ID
+            "T": 1498793709153, # Timestamp
+            "m": True,          # Whether the buyer was the maker
+            "M": True           # Whether the trade was the best price match
+        }
+        ]
+        """
