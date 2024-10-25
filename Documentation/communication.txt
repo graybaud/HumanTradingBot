@@ -1,0 +1,72 @@
+Here's a clear summary for each component in this *Communication Module*:
+
+---
+
+### **Module Overview: Communication Module**
+The *Communication Module* is responsible for handling interactions with the API. It includes handling requests, managing retries, validating parameters, and processing responses. It is structured to facilitate interactions through a collection of specialized endpoint classes that inherit the API handling functionality, each addressing a specific part of the API (e.g., general information, market data, trading, and user data). These classes abstract away low-level details, enabling simplified, robust API requests, and error management. 
+
+---
+
+### **1. `RequestHandler` Class**
+- **Responsibility**: `RequestHandler` is the core class for managing the HTTP request flow to the API. It encapsulates headers, security parameters, signing, and retry management.
+- **Inputs**: 
+  - `api_key`, `api_secret`, and `base_url` from the configuration.
+  - `method`, `endpoint`, `params`, `data`, and `weight` for each request.
+- **Outputs**: Returns a structured response processed by `ResponseHandler` or triggers a retry via `RetryManager` when needed.
+- **Functionality**: 
+  - `_get_headers()` adds API key headers.
+  - `_add_security_params()` and `_sign()` handle security requirements for sensitive requests.
+  - `retry_request()` manages endpoint and request details, calling `RetryManager` to ensure retries are limited within configured parameters.
+- **Interactions**: Calls methods from `RetryManager` to retry requests and from `ResponseHandler` to validate responses.
+
+---
+
+### **2. `ResponseHandler` Class**
+- **Responsibility**: `ResponseHandler` interprets the API response status codes and categorizes responses based on their status or error codes. This enables standardized handling of each response.
+- **Inputs**: `response` from `requests.request` call.
+- **Outputs**: Returns a parsed response dictionary if successful, or error information if not.
+- **Functionality**:
+  - Analyzes status codes, identifying successes (200), client-side errors (4XX), server-side errors (5XX), and specific cases (e.g., rate limits, IP bans).
+  - Returns structured data for each case, such as retry intervals for rate limits or detailed error messages for invalid symbols or insufficient balance.
+- **Interactions**: Used by `RequestHandler` to finalize responses after HTTP requests.
+
+---
+
+### **3. `RetryManager` Class**
+- **Responsibility**: Manages retry logic, including exponential backoff, time constraints, and API rate limit checking.
+- **Inputs**: 
+  - `retries`, `max_retry_time`, and rate limit thresholds from configuration.
+  - `request_weight` for each request and API response headers.
+- **Outputs**: Executes the retry mechanism, either completing a request successfully or throwing an exception if limits are reached.
+- **Functionality**:
+  - `_check_api_limits()` reads rate limit data from API headers and updates internal tracking.
+  - `can_make_request()` assesses if a request meets weight thresholds.
+  - `execute_with_retry()` retries a request within constraints, applying exponential backoff to avoid hitting limits.
+- **Interactions**: Used by `RequestHandler` for retrying failed requests and managing API rate limit adherence.
+
+---
+
+### **4. `APIClient` Class**
+- **Responsibility**: Central client class handling base API functions, request weight checks, and time synchronization with the server.
+- **Inputs**: Instantiates `RequestHandler` and `RetryManager`, with time offset obtained from the server.
+- **Outputs**: Returns data from API calls (e.g., server time) and checks limit adherence before each request.
+- **Functionality**:
+  - `_get_time_offset()` synchronizes local and server time.
+  - `_check_api_limits_before_request()` assesses if upcoming requests align with weight and order count limits.
+- **Interactions**: Used as a base class for endpoint classes, inheriting its methods to streamline API requests.
+
+---
+
+### **5. Endpoint Classes: `GeneralEndpoint`, `MarketData`, `TradeEndpoint`, `UserData`**
+Each endpoint class inherits from `APIClient` and serves as an interface for specific API functions related to their names. These classes delegate request handling to `RequestHandler` while incorporating parameter validation from `ParameterValidator`.
+
+#### **`GeneralEndpoint`**
+- **Responsibility**: Handles API requests for general, non-sensitive data.
+- **Methods**:
+  - `ping()`: Verifies API connectivity.
+  - `get_server_time()`: Retrieves server time to check synchronization.
+  - `get_exchangeInfo()`: Retrieves exchange information, optionally filtered by symbol, symbols list, or permissions.
+
+---
+
+This module thus provides a robust, centralized framework for making API calls, retrying failed requests, and handling responses with systematic error checking and validation.
