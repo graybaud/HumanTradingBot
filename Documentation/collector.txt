@@ -1,0 +1,101 @@
+Bien sûr, voici un résumé formalisé du module `Collector` contenant les classes `CacheManager` et `DataCollector`.
+Ce résumé met en avant le rôle de chaque classe, leurs interactions, leurs responsabilités,
+ainsi que les entrées et sorties essentielles pour qu’un développeur puisse en saisir le fonctionnement rapidement.
+
+---
+
+### Module `Collector`
+
+Le module `Collector` est conçu pour centraliser et gérer les opérations de collecte,
+de stockage, et de récupération des données de marché et des informations d'échange.
+Ce module intègre deux principales classes, `CacheManager` et `DataCollector`,
+qui agissent en collaboration pour récupérer les données des symboles de trading suivis
+et optimiser l’accès à ces données à partir d’une base de données locale.
+Le module vise à fournir des données prêtes pour le calcul d’indicateurs
+et l’analyse stratégique des symboles de trading.
+
+#### Classe `CacheManager`
+
+**Description**  
+`CacheManager` est une classe responsable de la gestion de la base de données locale (type NoSQL)
+où sont stockées les données historiques et les informations générales de chaque symbole
+et timeframe suivis. Elle assure le chargement et le stockage de ces données en fichiers JSON,
+offrant ainsi un accès rapide aux informations sans requêtes excessives à l’API de trading.
+
+**Responsabilités**  
+- **Chargement des données** : Charger les données de marché pour chaque symbole
+et timeframe depuis la base locale (fichiers JSON) si elles existent.
+- **Stockage des données** : Sauvegarder les nouvelles données récupérées depuis
+l’API dans le cache pour un accès ultérieur.
+- **Gestion des informations d'échange** : Stocker des informations générales sur
+l’échange (listes des symboles disponibles, contraintes de trading, etc.) pour optimiser la récupération des données.
+- **Intégration des erreurs** : En cas d’erreur de chargement ou de sauvegarde,
+la classe collabore avec `ErrorManager` pour une gestion d’erreurs automatisée et un logging de qualité.
+
+**Inputs et Outputs**  
+- **Inputs** : Symboles et timeframes pour identifier les données spécifiques,
+ainsi que les DataFrames contenant les données de marché ou d’échange.
+- **Outputs** : DataFrames récupérés du cache ou enregistrés en JSON,
+prêtes à être utilisées dans `DataCollector` pour enrichir les analyses.
+
+**Interactions**  
+`CacheManager` est principalement appelé par `DataCollector` pour fournir
+les données historiques stockées. Il interagit avec un `ErrorManager`
+pour assurer un flux de travail sans interruptions en cas de problèmes lors du chargement ou de la sauvegarde.
+
+#### Classe `DataCollector`
+
+**Description**  
+`DataCollector` est la classe principale de collecte de données,
+responsable de récupérer les données de marché et de compte utilisateur depuis l’API,
+de les stocker dans `CacheManager`, et de les fournir pour un usage analytique.
+Cette classe prend en compte des symboles et des timeframes définis
+dans un fichier de configuration, permettant ainsi de collecter des données diversifiées et pertinentes.
+Elle est également capable de raffiner dynamiquement les symboles/timeframes suivis en fonction d’analyses de marché.
+
+**Responsabilités**  
+- **Initialisation de la collecte** : Charger les données historiques stockées
+pour les symboles et timeframes définis, et si elles n’existent pas dans le cache,
+récupérer ces données depuis l’API de trading.
+- **Récupération des données périodiques** : Effectuer des requêtes API pour obtenir
+les dernières données de marché et les stocker via `CacheManager` pour un accès rapide.
+- **Affinage des symboles et timeframes** : Après une première phase de collecte
+et d’analyse, affiner les symboles et timeframes suivis pour se concentrer sur les actifs les plus pertinents.
+- **Gestion des informations de compte** : Récupérer et stocker les informations
+de compte utilisateur (soldes, positions, etc.) pour être utilisées dans la gestion des risques et des ordres de trading.
+- **Collecte des informations d'échange** : Recueillir et stocker des données
+globales sur les contraintes d’échange (par exemple, tailles minimales de lot par symbole) pour des opérations de trading conformes.
+
+**Inputs et Outputs**  
+- **Inputs** : `api_client` pour les appels API, `cache_manager`
+pour la gestion du cache, `error_manager` pour les erreurs, et un fichier de configuration
+contenant la liste initiale des symboles et timeframes.
+- **Outputs** : DataFrames de données de marché pour chaque symbole et timeframe
+stockées dans `self.data` et enrichies par les calculs d’indicateurs. 
+
+**Interactions**  
+- `DataCollector` s’appuie sur `CacheManager` pour charger les données en cache
+ou les stocker une fois qu’elles ont été récupérées de l’API.
+- Les interactions avec `ErrorManager` assurent une gestion d’erreurs robuste
+pour des problèmes éventuels lors des appels API ou du chargement des données.
+  
+**Processus en plusieurs étapes**  
+1. **Chargement de la configuration** : Au démarrage, la classe charge
+les symboles et timeframes depuis le fichier de configuration.
+2. **Collecte de données initiale** : Récupère les données de marché soit
+en les chargeant depuis `CacheManager`, soit en effectuant des requêtes API si elles ne sont pas en cache.
+3. **Affinage** : Une fois les premières analyses faites, la sélection
+de symboles et de timeframes est raffinée en fonction de critères d’activité, de volatilité, ou d’autres indicateurs stratégiques.
+4. **Stockage et accès** : Les données raffinées sont stockées et prêtes pour
+les calculs d’indicateurs, l’analyse des signaux et la gestion des ordres de trading dans d’autres modules.
+
+---
+
+### Synthèse du module `Collector`
+
+En somme, le module `Collector` est dédié à l’approvisionnement
+et à la gestion des données de marché et d’échange,
+assurant que le bot dispose d’informations actualisées et optimisées en permanence.
+Ce module permet un accès rapide aux données grâce à `CacheManager`,
+et ajuste dynamiquement les symboles/timeframes suivis par `DataCollector`
+pour maximiser la pertinence des analyses et minimiser les coûts de requêtes API.
