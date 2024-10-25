@@ -1,0 +1,33 @@
+Query Unfilled Order Count (USER_DATA)
+GET /api/v3/rateLimit/order
+
+Displays the user's unfilled order count for all intervals.
+
+Weight: 40
+
+Parameters:
+
+Name	Type	Mandatory	Description
+recvWindow	LONG	NO	The value cannot be greater than 60000
+timestamp	LONG	YES	
+Data Source: Memory
+
+Response:
+
+[
+
+  {
+    "rateLimitType": "ORDERS",
+    "interval": "SECOND",
+    "intervalNum": 10,
+    "limit": 50,
+    "count": 0
+  },
+  {
+    "rateLimitType": "ORDERS",
+    "interval": "DAY",
+    "intervalNum": 1,
+    "limit": 160000,
+    "count": 0
+  }
+]

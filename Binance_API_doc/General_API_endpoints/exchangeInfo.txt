@@ -1,0 +1,273 @@
+Exchange information
+GET /api/v3/exchangeInfo
+
+Current exchange trading rules and symbol information
+
+Weight: 20
+
+Parameters:
+
+There are 4 possible options:
+
+Options	Example
+No parameter	curl -X GET "https://api.binance.com/api/v3/exchangeInfo"
+symbol	curl -X GET "https://api.binance.com/api/v3/exchangeInfo?symbol=BNBBTC"
+symbols	curl -X GET "https://api.binance.com/api/v3/exchangeInfo?symbols=%5B%22BNBBTC%22,%22BTCUSDT%22%5D"
+or
+curl -g -X GET 'https://api.binance.com/api/v3/exchangeInfo?symbols=["BTCUSDT","BNBBTC"]'
+permissions	curl -X GET "https://api.binance.com/api/v3/exchangeInfo?permissions=SPOT"
+or
+curl -X GET "https://api.binance.com/api/v3/exchangeInfo?permissions=%5B%22MARGIN%22%2C%22LEVERAGED%22%5D"
+or
+curl -g -X GET 'https://api.binance.com/api/v3/exchangeInfo?permissions=["MARGIN","LEVERAGED"]'
+Notes:
+
+If the value provided to symbol or symbols do not exist, the endpoint will throw an error saying the symbol is invalid.
+All parameters are optional.
+permissions can support single or multiple values (e.g. SPOT, ["MARGIN","LEVERAGED"])
+If permissions parameter not provided, the default values will be ["SPOT","MARGIN","LEVERAGED"].
+To display all permissions you need to specify them explicitly: (e.g. ["SPOT","MARGIN",...].). See Account and Symbol Permissions for the full list.
+Examples of Symbol Permissions Interpretation from the Response:
+[["A","B"]] means you may place an order if your account has either permission "A" or permission "B".
+[["A"],["B"]] means you can place an order if your account has permission "A" and permission "B".
+[["A"],["B","C"]] means you can place an order if your account has permission "A" and permission "B" or permission "C". (Inclusive or is applied here, not exclusive or, so your account may have both permission "B" and permission "C".)
+Data Source: Memory
+
+Response:
+
+{
+  "timezone": "UTC",
+  "serverTime": 1565246363776,
+  "rateLimits": [
+    {
+      // These are defined in the `ENUM definitions` section under `Rate Limiters (rateLimitType)`.
+      // All limits are optional
+    }
+  ],
+  "exchangeFilters": [
+    // These are the defined filters in the `Filters` section.
+    // All filters are optional.
+  ],
+  "symbols": [
+    {
+      "symbol": "ETHBTC",
+      "status": "TRADING",
+      "baseAsset": "ETH",
+      "baseAssetPrecision": 8,
+      "quoteAsset": "BTC",
+      "quotePrecision": 8, // will be removed in future api versions (v4+)
+      "quoteAssetPrecision": 8,
+      "baseCommissionPrecision": 8,
+      "quoteCommissionPrecision": 8,
+      "orderTypes": [
+        "LIMIT",
+        "LIMIT_MAKER",
+        "MARKET",
+        "STOP_LOSS",
+        "STOP_LOSS_LIMIT",
+        "TAKE_PROFIT",
+        "TAKE_PROFIT_LIMIT"
+      ],
+      "icebergAllowed": true,
+      "ocoAllowed": true,
+      "otoAllowed": true,
+      "quoteOrderQtyMarketAllowed": true,
+      "allowTrailingStop": false,
+      "cancelReplaceAllowed":false,
+      "isSpotTradingAllowed": true,
+      "isMarginTradingAllowed": true,
+      "filters": [
+        // These are defined in the Filters section.
+        // All filters are optional
+      ],
+      "permissions": [],
+      "permissionSets": [
+        [
+          "SPOT",
+          "MARGIN"
+        ]
+      ],
+      "defaultSelfTradePreventionMode": "NONE",
+      "allowedSelfTradePreventionModes": [
+        "NONE"
+      ]
+    }
+  ],
+  // Optional field. Present only when SOR is available.
+  // https://github.com/binance/binance-spot-api-docs/blob/master/faqs/sor_faq.md
+  "sors": [
+    {
+      "baseAsset": "BTC",
+      "symbols": [
+        "BTCUSDT",
+        "BTCUSDC"
+      ]
+    }
+  ]
+}
+
+
+Note: L'endpoint `exchangeInfo` de l'API Binance, accessible via la méthode GET,
+permet d'obtenir des informations complètes sur les règles de trading de la plateforme
+ainsi que sur les différents symboles (paires de trading) disponibles.
+Voici une analyse des principaux éléments que cet endpoint fournit, ainsi que les cas d'utilisation associés :
+
+### 1. **Objectif principal de l'endpoint `exchangeInfo`**
+   L'endpoint `exchangeInfo` fournit des informations essentielles sur :
+   - **Les règles de trading** applicables sur Binance (comme les types
+   d'ordres autorisés, les filtres sur les ordres, les permissions).
+   - **Les symboles disponibles** pour le trading (paires de devises comme ETH/BTC, BTC/USDT, etc.).
+   - **Les limites de précision** pour les actifs, les commissions et la taille des ordres.
+   - **Les permissions de trading** liées aux symboles (Spot, Margin, Leveraged, etc.).
+
+   Cela permet aux utilisateurs de connaître les caractéristiques de chaque
+   marché (symbole), de s'assurer que leurs ordres respectent les règles,
+   et de vérifier les permissions de leur compte.
+
+### 2. **Cas d'utilisation et analyse des paramètres**
+   L'API permet quatre types de requêtes différentes à cet endpoint, chacune correspondant à un besoin spécifique :
+
+   - **Sans paramètres** : Cette option renvoie des informations globales sur
+   tous les symboles disponibles sur l'échange. C'est utile lorsque vous voulez une vue d'ensemble complète des marchés.
+     ```bash
+     curl -X GET "https://api.binance.com/api/v3/exchangeInfo"
+     ```
+
+   - **Avec un symbole unique** : Cette requête renvoie les informations
+   concernant un seul symbole (par exemple, `BNBBTC`), comme son état de trading,
+   les types d'ordres disponibles, et les filtres d'ordre.
+   Cela permet de se concentrer sur une paire de trading spécifique.
+     ```bash
+     curl -X GET "https://api.binance.com/api/v3/exchangeInfo?symbol=BNBBTC"
+     ```
+
+   - **Avec plusieurs symboles** : Cette option permet de spécifier plusieurs
+   symboles en une seule requête. Cela permet d'obtenir des informations pour
+   plusieurs paires de devises en une seule réponse, ce qui peut être plus
+   efficace si vous ne voulez pas interroger chaque symbole individuellement.
+     ```bash
+     curl -X GET "https://api.binance.com/api/v3/exchangeInfo?symbols=%5B%22BNBBTC%22,%22BTCUSDT%22%5D"
+     ```
+
+   - **Avec des permissions spécifiques** : Vous pouvez utiliser ce paramètre
+   pour récupérer les informations relatives aux symboles en fonction de leurs
+   permissions de trading (par exemple, SPOT, MARGIN, LEVERAGED).
+   Cela permet de filtrer les symboles en fonction des types de trading autorisés par Binance.
+     ```bash
+     curl -X GET "https://api.binance.com/api/v3/exchangeInfo?permissions=SPOT"
+     ```
+
+### 3. **Détails importants de la réponse**
+
+   La réponse de cet endpoint contient plusieurs informations critiques
+   pour comprendre les règles de trading et gérer les ordres sur Binance :
+
+   - **timezone** et **serverTime** : Ces informations vous permettent de
+   synchroniser votre application avec l'heure du serveur de Binance.
+   
+   - **rateLimits** : Ces informations sont liées aux limites de l'API
+   (comme les limites de requêtes par minute), essentielles pour ne pas
+   dépasser les restrictions imposées par Binance.
+   
+   - **exchangeFilters** : Ce sont des filtres globaux applicables à tous
+   les ordres sur la plateforme (par exemple, des filtres de prix, de quantité minimale/maximale, etc.).
+   
+   - **symbols** : Ce tableau contient les détails spécifiques pour chaque
+   symbole. Pour chaque paire de devises, vous obtenez des informations telles que :
+     - **status** : Le statut de la paire de trading
+     (par exemple, `TRADING` pour les paires disponibles).
+     - **baseAsset** et **quoteAsset** : Les actifs de base et de cotation pour le symbole
+     (par exemple, ETH et BTC pour ETHBTC).
+     - **orderTypes** : Les types d'ordres que vous pouvez passer sur cette paire
+     (par exemple, `LIMIT`, `MARKET`, `STOP_LOSS`, etc.).
+     - **icebergAllowed**, **ocoAllowed**, **otoAllowed** :
+     Ces flags indiquent si certaines fonctionnalités spécifiques,
+     comme les ordres iceberg ou OCO (One Cancels the Other),
+     sont autorisées sur cette paire.
+     - **permissions** et **permissionSets** : Ces champs vous disent si
+     vous pouvez trader ce symbole en mode SPOT, MARGIN, ou LEVERAGED,
+     ce qui est essentiel pour déterminer les stratégies de trading disponibles.
+
+### 4. **Utilisation et interprétation des permissions**
+   L'API permet d'obtenir des informations sur les permissions de trading
+   pour chaque symbole. Cela est utile pour savoir si vous avez le droit
+   de passer des ordres sur un marché donné en fonction des types de
+   trading activés sur votre compte. Voici un résumé de la logique des permissions :
+   
+   - **["A", "B"]** signifie que vous pouvez passer un ordre si votre compte dispose de la permission A **ou** B.
+   - **["A"],["B"]** signifie que vous devez avoir à la fois la permission A **et** B pour passer un ordre.
+   - **["A"],["B", "C"]** signifie que vous pouvez trader si vous avez A **et** B, ou bien A **et** C.
+
+### 5. **Utilisation dans un contexte de bot de trading**
+   Pour un bot de trading comme celui que vous développez, cet endpoint est crucial pour :
+   - Vérifier la disponibilité des paires de trading.
+   - Obtenir les types d'ordres autorisés sur une paire donnée,
+   afin d'éviter de soumettre des ordres invalides.
+   - S'assurer que votre compte a les bonnes permissions pour trader un symbole
+   (par exemple, si votre bot doit gérer des positions en **Margin** ou **Spot**).
+   - Mettre à jour automatiquement les informations de l'échange dans
+   votre système à des intervalles réguliers pour rester à jour avec les nouvelles règles et symboles ajoutés.
+
+### 6. **Poids de la requête**
+   L'appel à cet endpoint a un poids de **20**, ce qui signifie qu'il
+   consomme une part significative de votre quota de requêtes sur Binance.
+   Par conséquent, il ne devrait pas être appelé trop fréquemment. Une stratégie efficace serait de :
+   - Mettre en cache les résultats pendant un certain temps.
+   - Ne l'interroger que lorsque c'est absolument nécessaire (par exemple,
+   au démarrage du bot ou lors de l'ajout de nouvelles paires à surveiller).
+
+### Conclusion
+L'endpoint `exchangeInfo` est un point d'entrée fondamental pour comprendre
+l'état et les règles des marchés sur Binance. Il est utile pour configurer
+un bot de trading avec les informations exactes sur les symboles disponibles,
+les types d'ordres permis, et les permissions de trading.
+
+
+
+    def get_exchangeInfo(self, symbol=None, symbols=None, permissions=None):
+        """
+        Get current exchange trading rules and symbol information.
+
+        Weight:
+            - 20 for each request.
+
+        Input:
+            - symbol (string): Optional. The trading pair to get info about (e.g., "BTCUSDT").
+            - symbols (list of strings): Optional. A list of symbols to retrieve info about (e.g., ["BTCUSDT", "ETHBTC"]).
+            - permissions (string or list of strings): Optional. Permissions to filter by (e.g., "SPOT", ["MARGIN", "LEVERAGED"]).
+
+        Output:
+            - Returns the exchange's current trading rules, rate limits, and symbol information.
+
+        Response example:
+            {
+            "timezone": "UTC",
+            "serverTime": 1565246363776,
+            "rateLimits": [
+                // API rate limit definitions
+            ],
+            "exchangeFilters": [
+                // Exchange-wide filters
+            ],
+            "symbols": [
+                {
+                "symbol": "ETHBTC",
+                "status": "TRADING",
+                "baseAsset": "ETH",
+                "quoteAsset": "BTC",
+                "orderTypes": ["LIMIT", "MARKET", "STOP_LOSS"],
+                "icebergAllowed": true,
+                "isSpotTradingAllowed": true,
+                "isMarginTradingAllowed": true,
+                "filters": [
+                    // Symbol-specific filters
+                ]
+                }
+            ]
+            }
+
+        Notes:
+            - This endpoint provides detailed information about the exchange's trading pairs, permissions, and rate limits.
+            - The `permissions` parameter allows you to filter symbols based on allowed trading modes (e.g., SPOT, MARGIN).
+            - If no parameters are provided, it returns information about all symbols and trading pairs.
+        """

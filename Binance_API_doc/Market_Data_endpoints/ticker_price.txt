@@ -40,3 +40,22 @@ OR
     "price": "0.07946600"
   }
 ]
+
+
+    def get_symbol_price(self, symbol=None, symbols=None):
+        """
+        Calls the latest price for a given symbol or symbols.
+
+        Weight:
+            - With one symbol: 2
+            - Without symbol or multiple symbols: 4
+
+        Input:
+            - symbol (string): The trading pair (optional).
+            - symbols (list of strings): List of trading pairs (optional).
+
+        Output:
+            - Returns the latest price for the specified symbol(s).
+
+        If no symbol or symbols are specified, returns prices for all symbols.
+        """

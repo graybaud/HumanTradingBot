@@ -111,3 +111,43 @@ Response:
     ]
   }
 ]
+
+
+    def cancel_order(self, symbol, orderId=None, origClientOrderId=None, newClientOrderId=None, cancelRestrictions=None, recvWindow=None):
+        """
+        Cancel an active order.
+
+        Weight:
+            - 1 for each request.
+
+        Input:
+            - symbol (string): Required. The trading pair (e.g., "BTCUSDT").
+            - orderId (long): Optional. The unique order ID.
+            - origClientOrderId (string): Optional. The original client order ID.
+            - newClientOrderId (string): Optional. A new client order ID to uniquely identify the cancellation.
+            - cancelRestrictions (enum): Optional. Supported values: "ONLY_NEW", "ONLY_PARTIALLY_FILLED".
+            - recvWindow (long): Optional. The value cannot exceed 60000.
+            - timestamp (long): Required and handled by the client.
+
+        Output:
+            - Returns the details of the canceled order.
+
+        Response example:
+            {
+            "symbol": "LTCBTC",
+            "origClientOrderId": "myOrder1",
+            "orderId": 4,
+            "orderListId": -1,
+            "clientOrderId": "cancelMyOrder1",
+            "transactTime": 1684804350068,
+            "price": "2.00000000",
+            "origQty": "1.00000000",
+            "executedQty": "0.00000000",
+            "cummulativeQuoteQty": "0.00000000",
+            "status": "CANCELED",
+            "timeInForce": "GTC",
+            "type": "LIMIT",
+            "side": "BUY",
+            "selfTradePreventionMode": "NONE"
+            }
+        """

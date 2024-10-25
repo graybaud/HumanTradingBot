@@ -1,0 +1,47 @@
+Query Prevented Matches (USER_DATA)
+GET /api/v3/myPreventedMatches
+
+Displays the list of orders that were expired due to STP.
+
+These are the combinations supported:
+
+symbol + preventedMatchId
+symbol + orderId
+symbol + orderId + fromPreventedMatchId (limit will default to 500)
+symbol + orderId + fromPreventedMatchId + limit
+Parameters:
+
+Name	Type	Mandatory	Description
+symbol	STRING	YES	
+preventedMatchId	LONG	NO	
+orderId	LONG	NO	
+fromPreventedMatchId	LONG	NO	
+limit	INT	NO	Default: 500; Max: 1000
+recvWindow	LONG	NO	The value cannot be greater than 60000
+timestamp	LONG	YES	
+Weight:
+
+Case	Weight
+If symbol is invalid	2
+Querying by preventedMatchId	2
+Querying by orderId	20
+Data Source:
+
+Database
+
+Response:
+
+[
+  {
+    "symbol": "BTCUSDT",
+    "preventedMatchId": 1,
+    "takerOrderId": 5,
+    "makerSymbol": "BTCUSDT",
+    "makerOrderId": 3,
+    "tradeGroupId": 1,
+    "selfTradePreventionMode": "EXPIRE_MAKER",
+    "price": "1.100000",
+    "makerPreventedQuantity": "1.300000",
+    "transactTime": 1669101687094
+  }
+]

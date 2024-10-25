@@ -132,7 +132,9 @@ OR
 ]
 
 24-hour Ticker Price Change Statistics (GET /api/v3/ticker/24hr)
-Cet endpoint renvoie des statistiques sur les changements de prix pour une fenêtre glissante de 24 heures. Il est possible de récupérer les statistiques pour un symbole spécifique ou pour plusieurs symboles à la fois. La réponse peut également être fournie dans différents formats (FULL ou MINI), selon les besoins.
+Cet endpoint renvoie des statistiques sur les changements de prix pour une fenêtre glissante de 24 heures.
+Il est possible de récupérer les statistiques pour un symbole spécifique ou pour plusieurs symboles à la fois.
+La réponse peut également être fournie dans différents formats (FULL ou MINI), selon les besoins.
 
 Poids (Weight) :
 Avec un symbole : 2.
@@ -213,3 +215,23 @@ Copier le code
   "lastId": 28460,
   "count": 76
 }
+
+
+    def get_24hr_ticker(self, symbol=None, symbols=None, dataType="FULL"):
+        """
+        Calls the 24hr price ticker statistics endpoint.
+
+        Weight: 
+            - With one symbol: 2
+            - Without symbol or more than 100 symbols: 80
+            - 1-20 symbols: 2
+            - 21-100 symbols: 40
+
+        Input:
+            - symbol (string): The trading pair (optional).
+            - symbols (list of strings): List of trading pairs (optional).
+            - dataType (string): Can be 'FULL' or 'MINI' to specify the response type (default is 'FULL').
+
+        Output:
+            - Returns 24hr rolling window price change statistics for a given symbol(s) in FULL or MINI format.
+        """

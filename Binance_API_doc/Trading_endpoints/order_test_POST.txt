@@ -1,0 +1,86 @@
+Test new order (TRADE)
+POST /api/v3/order/test
+
+Test new order creation and signature/recvWindow long. Creates and validates a new order but does not send it into the matching engine.
+
+Weight:
+
+Condition	Request Weight
+Without computeCommissionRates	1
+With computeCommissionRates	20
+Parameters:
+
+In addition to all parameters accepted by POST /api/v3/order, the following optional parameters are also accepted:
+
+Name	Type	Mandatory	Description
+computeCommissionRates	BOOLEAN	NO	Default: false
+Data Source: Memory
+
+Response:
+
+Without computeCommissionRates
+
+{}
+
+With computeCommissionRates
+
+{
+  "standardCommissionForOrder": {  //Standard commission rates on trades from the order.
+    "maker": "0.00000112",
+    "taker": "0.00000114",
+  },
+  "taxCommissionForOrder": {       //Tax commission rates for trades from the order.
+    "maker": "0.00000112",
+    "taker": "0.00000114",
+  },
+  "discount": {                    //Discount on standard commissions when paying in BNB.
+    "enabledForAccount": true,
+    "enabledForSymbol": true,
+    "discountAsset": "BNB",
+    "discount": "0.25000000"       //Standard commission is reduced by this rate when paying commission in BNB.
+  }
+}
+
+
+    def order_test_POST(self, symbol, side, type, timeInForce=None, quantity=None, price=None, computeCommissionRates=False, **kwargs):
+        """
+        Test new order creation and signature without sending it to the matching engine.
+
+        Weight:
+            - 1 without computeCommissionRates.
+            - 20 with computeCommissionRates.
+
+        Input:
+            - symbol (string): Required. The trading pair (e.g., "BTCUSDT").
+            - side (string): Required. "BUY" or "SELL".
+            - type (string): Required. Order type (e.g., "LIMIT", "MARKET").
+            - timeInForce (string): Optional. Time in force for the order (e.g., "GTC").
+            - quantity (decimal): Optional. Quantity of the order.
+            - price (decimal): Optional. Price of the order.
+            - computeCommissionRates (bool): Optional. Whether to compute commission rates. Default is False.
+            - kwargs: Additional parameters for the order.
+
+        Output:
+            - Returns an empty dictionary if computeCommissionRates is False, or commission data if it is True.
+
+        Response example with `computeCommissionRates` set to False:
+            {}
+
+        Response example with `computeCommissionRates` set to True:
+            {
+            "standardCommissionForOrder": {
+                "maker": "0.00000112",
+                "taker": "0.00000114"
+            },
+            "taxCommissionForOrder": {
+                "maker": "0.00000112",
+                "taker": "0.00000114"
+            },
+            "discount": {
+                "enabledForAccount": true,
+                "enabledForSymbol": true,
+                "discountAsset": "BNB",
+                "discount": "0.25000000"
+            }
+            }
+        """

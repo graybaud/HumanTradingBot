@@ -1,0 +1,16 @@
+Keepalive user data stream (USER_STREAM)
+PUT /api/v3/userDataStream
+
+Keepalive a user data stream to prevent a time out. User data streams will close after 60 minutes. It's recommended to send a ping about every 30 minutes.
+
+Weight: 2
+
+Data Source: Memory
+
+Parameters:
+
+Name	Type	Mandatory	Description
+listenKey	STRING	YES	
+Response:
+
+{}

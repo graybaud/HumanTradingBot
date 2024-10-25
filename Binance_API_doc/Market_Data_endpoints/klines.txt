@@ -100,3 +100,23 @@ Copier le code
     "0"
   ]
 ]
+
+
+
+    def get_klines(self, symbol, interval, startTime=None, endTime=None, timeZone="0", limit=500):
+        """
+        Calls the endpoint for Kline/Candlestick data.
+
+        Weight: 2
+
+        Input:
+            - symbol (string): The trading pair (e.g., 'BTCUSDT').
+            - interval (string): The Kline interval (e.g., '1m', '1h', '1d').
+            - startTime (long): The start timestamp for fetching the klines (optional).
+            - endTime (long): The end timestamp for fetching the klines (optional).
+            - timeZone (string): The time zone for interpreting intervals (optional, default: UTC).
+            - limit (int): Number of klines to retrieve (default: 500, max: 1000).
+
+        Output:
+            - Returns a list of Kline/candlestick data with detailed pricing information.
+        """

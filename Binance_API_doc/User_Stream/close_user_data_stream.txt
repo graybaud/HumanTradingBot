@@ -1,0 +1,16 @@
+Close user data stream (USER_STREAM)
+DELETE /api/v3/userDataStream
+
+Close out a user data stream.
+
+Weight: 2
+
+Parameters:
+
+Name	Type	Mandatory	Description
+listenKey	STRING	YES	
+Data Source: Memory
+
+Response:
+
+{}
