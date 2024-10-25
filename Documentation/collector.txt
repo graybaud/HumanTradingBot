@@ -1,0 +1,57 @@
+Of course, here’s a formalized summary of the `Collector` module containing the `CacheManager` and `DataCollector` classes. This summary highlights each class's role, their interactions, responsibilities, as well as essential inputs and outputs to enable a new developer to quickly grasp its functionality.
+
+---
+
+### **Collector Module**
+
+The `Collector` module is designed to centralize and manage market data and exchange information retrieval, storage, and access. This module incorporates two main classes, `CacheManager` and `DataCollector`, which work together to retrieve data for tracked trading symbols and optimize access to this data from a local database. It provides data ready for indicator calculation and strategic analysis of trading symbols.
+
+#### **CacheManager Class**
+
+**Description**  
+The `CacheManager` class is responsible for managing a local database (NoSQL type) that stores historical data and general information for each tracked symbol and timeframe. It handles loading and storing this data in JSON files, thus offering fast access to information without excessive requests to the trading API.
+
+**Responsibilities**  
+- **Data Loading**: Load market data for each symbol and timeframe from the local cache (JSON files) if available.
+- **Data Storage**: Save new data retrieved from the API into the cache for future access.
+- **Exchange Information Management**: Store general exchange information (lists of available symbols, trading constraints, etc.) to optimize data retrieval.
+- **Error Integration**: In case of loading or saving errors, the class collaborates with `ErrorManager` for automated error handling and quality logging.
+
+**Inputs and Outputs**  
+- **Inputs**: Symbols and timeframes to identify specific data, as well as DataFrames containing market or exchange data.
+- **Outputs**: DataFrames retrieved from the cache or saved in JSON, ready for use in `DataCollector` to enrich analysis.
+
+**Interactions**  
+`CacheManager` is primarily called by `DataCollector` to provide stored historical data. It interacts with an `ErrorManager` to ensure smooth operation in case of issues during loading or saving.
+
+#### **DataCollector Class**
+
+**Description**  
+`DataCollector` is the primary data collection class, responsible for retrieving market data and user account information from the API, storing it in `CacheManager`, and providing it for analytical use. This class considers symbols and timeframes defined in a configuration file, allowing the collection of diverse and relevant data. It can also dynamically refine the symbols/timeframes being tracked based on market analyses.
+
+**Responsibilities**  
+- **Collection Initialization**: Load stored historical data for defined symbols and timeframes, and if unavailable in the cache, retrieve this data from the trading API.
+- **Periodic Data Retrieval**: Perform API requests to get the latest market data and store it via `CacheManager` for quick access.
+- **Refinement of Symbols and Timeframes**: After an initial phase of collection and analysis, refine the tracked symbols and timeframes to focus on the most relevant assets.
+- **Account Information Management**: Retrieve and store user account information (balances, positions, etc.) for use in risk management and trading orders.
+- **Exchange Information Collection**: Gather and store global data on exchange constraints (e.g., minimum lot sizes per symbol) for compliant trading operations.
+
+**Inputs and Outputs**  
+- **Inputs**: `api_client` for API calls, `cache_manager` for cache management, `error_manager` for error handling, and a configuration file containing the initial list of symbols and timeframes.
+- **Outputs**: Market data DataFrames for each symbol and timeframe, stored in `self.data` and enriched by indicator calculations.
+
+**Interactions**  
+- `DataCollector` relies on `CacheManager` to load or store cached data after retrieving it from the API.
+- Interactions with `ErrorManager` ensure robust error handling for issues that arise during API calls or data loading.
+
+**Multi-Step Process**  
+1. **Configuration Loading**: At startup, the class loads symbols and timeframes from the configuration file.
+2. **Initial Data Collection**: Retrieves market data by either loading from `CacheManager` or making API requests if not cached.
+3. **Refinement**: Once initial analyses are complete, the selection of symbols and timeframes is refined based on criteria such as activity, volatility, or other strategic indicators.
+4. **Storage and Access**: Refined data is stored and ready for indicator calculations, signal analysis, and trading order management in other modules.
+
+---
+
+### **Collector Module Summary**
+
+In sum, the `Collector` module is dedicated to supplying and managing market and exchange data, ensuring that the bot continuously has up-to-date and optimized information. This module allows fast data access via `CacheManager` and dynamically adjusts the tracked symbols/timeframes through `DataCollector` to maximize analysis relevance and minimize API request costs.

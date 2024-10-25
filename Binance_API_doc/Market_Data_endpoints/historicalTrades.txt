@@ -1,0 +1,66 @@
+Old trade lookup
+GET /api/v3/historicalTrades
+
+Get older trades.
+
+Weight: 25
+
+Parameters:
+
+Name	Type	Mandatory	Description
+symbol	STRING	YES	
+limit	INT	NO	Default 500; max 1000.
+fromId	LONG	NO	TradeId to fetch from. Default gets most recent trades.
+Data Source: Database
+
+Response:
+
+[
+  {
+    "id": 28457,
+    "price": "4.00000100",
+    "qty": "12.00000000",
+    "quoteQty": "48.000012",
+    "time": 1499865549590,
+    "isBuyerMaker": true,
+    "isBestMatch": true
+  }
+]
+
+
+
+1. Old Trade Lookup (GET /api/v3/historicalTrades)
+Cet endpoint permet de récupérer des trades plus anciens.
+Il utilise une source de données de type Database,
+ce qui signifie qu'il peut effectuer des requêtes plus coûteuses
+en termes de ressources. Le poids de cette requête est de 25,
+ce qui signifie qu'elle est relativement lourde en termes de consommation d'API rate limits.
+
+Paramètres :
+symbol (STRING, OBLIGATOIRE) : Le symbole de trading (e.g., BTCUSDT).
+limit (INT, NON) : Le nombre de trades à retourner (500 par défaut, 1000 max).
+fromId (LONG, NON) : L'ID du trade à partir duquel commencer la récupération.
+Réponse :
+La réponse est une liste de trades avec les champs suivants :
+
+id : L'ID du trade.
+price : Le prix auquel le trade a eu lieu.
+qty : La quantité échangée.
+quoteQty : Le montant en devise de cotation.
+time : Le timestamp du trade.
+isBuyerMaker : Un booléen qui indique si le buyer était le maker.
+isBestMatch : Un booléen qui indique si le trade était le meilleur prix.
+Exemple de réponse JSON :
+json
+Copier le code
+[
+  {
+    "id": 28457,
+    "price": "4.00000100",
+    "qty": "12.00000000",
+    "quoteQty": "48.000012",
+    "time": 1499865549590,
+    "isBuyerMaker": true,
+    "isBestMatch": true
+  }
+]
